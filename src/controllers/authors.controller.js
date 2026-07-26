@@ -20,10 +20,43 @@ export const getAuthorById = async (req, res) => {
     [id],
   );
 
+  if (result.rows.length === 0) {
+    return res.status(404).json({
+      message: "Author not found",
+    });
+  }
+
   res.status(200).json(result.rows[0]);
 };
 export const createAuthor = async (req, res) => {
   const { name, email, bio } = req.body;
+
+  if (!name || name.trim() === "") {
+    return res.status(400).json({
+      message: "Name is required",
+    });
+  }
+
+  if (!email || email.trim() === "") {
+    return res.status(400).json({
+      message: "Email is required",
+    });
+  }
+
+  const existingAuthor = await pool.query(
+    `
+    SELECT id
+    FROM authors
+    WHERE email = $1;
+    `,
+    [email],
+  );
+
+  if (existingAuthor.rows.length > 0) {
+    return res.status(400).json({
+      message: "Email already exists",
+    });
+  }
 
   const result = await pool.query(
     `
@@ -40,6 +73,34 @@ export const updateAuthor = async (req, res) => {
   const { id } = req.params;
   const { name, email, bio } = req.body;
 
+  if (!name || name.trim() === "") {
+    return res.status(400).json({
+      message: "Name is required",
+    });
+  }
+
+  if (!email || email.trim() === "") {
+    return res.status(400).json({
+      message: "Email is required",
+    });
+  }
+
+  const existingEmail = await pool.query(
+    `
+    SELECT id
+    FROM authors
+    WHERE email = $1
+      AND id != $2;
+    `,
+    [email, id],
+  );
+
+  if (existingEmail.rows.length > 0) {
+    return res.status(400).json({
+      message: "Email already exists",
+    });
+  }
+
   const result = await pool.query(
     `
     UPDATE authors
@@ -52,8 +113,15 @@ export const updateAuthor = async (req, res) => {
     [name, email, bio, id],
   );
 
+  if (result.rows.length === 0) {
+    return res.status(404).json({
+      message: "Author not found",
+    });
+  }
+
   res.status(200).json(result.rows[0]);
 };
+
 export const deleteAuthor = async (req, res) => {
   const { id } = req.params;
 
@@ -66,5 +134,11 @@ export const deleteAuthor = async (req, res) => {
     [id],
   );
 
-  res.status(200).json(result.rows[0]);
+  if (result.rows.length === 0) {
+    return res.status(404).json({
+      message: "Author not found",
+    });
+  }
+
+  res.status(204).send();
 };
