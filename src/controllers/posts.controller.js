@@ -78,43 +78,100 @@ export const createPost = async (req, res) => {
   res.status(201).json(result.rows[0]);
 };
 
-export const updatePost = async (req, res) => {
-  const { id } = req.params;
-  const { title, content, author_id, published } = req.body;
+export const updatePost = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { title, content, author_id, published } = req.body;
 
-  const result = await pool.query(
-    `
-    UPDATE posts
-    SET title = $1,
-        content = $2,
-        author_id = $3,
-        published = $4
-    WHERE id = $5
-    RETURNING *;
-    `,
-    [title, content, author_id, published, id],
-  );
+    if (!title || title.trim() === "") {
+      return res.status(400).json({ message: "Title is required" });
+    }
 
-  res.status(200).json(result.rows[0]);
+    if (!content || content.trim() === "") {
+      return res.status(400).json({ message: "Content is required" });
+    }
+
+    if (!author_id) {
+      return res.status(400).json({ message: "Author ID is required" });
+    }
+
+    const author = await pool.query(`SELECT id FROM authors WHERE id = $1`, [
+      author_id,
+    ]);
+
+    if (author.rows.length === 0) {
+      return res.status(404).json({
+        message: "Author not found",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE posts
+      SET title = $1,
+          content = $2,
+          author_id = $3,
+          published = $4
+      WHERE id = $5
+      RETURNING *;
+      `,
+      [title, content, author_id, published, id],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: "Post not found",
+      });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const deletePost = async (req, res) => {
-  const { id } = req.params;
+export const deletePost = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-  const result = await pool.query(
-    `
-    DELETE FROM posts
-    WHERE id = $1
-    RETURNING *;
-    `,
-    [id],
-  );
+    const result = await pool.query(
+      `
+      DELETE FROM posts
+      WHERE id = $1
+      RETURNING *;
+      `,
+      [id],
+    );
 
-  res.status(200).json(result.rows[0]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: "Post not found",
+      });
+    }
+
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getPostsByAuthor = async (req, res) => {
   const { authorId } = req.params;
+
+  const author = await pool.query(
+    `
+    SELECT id
+    FROM authors
+    WHERE id = $1;
+    `,
+    [authorId],
+  );
+
+  if (author.rows.length === 0) {
+    return res.status(404).json({
+      message: "Author not found",
+    });
+  }
 
   const result = await pool.query(
     `
