@@ -1,0 +1,493 @@
+openapi: 3.1.0
+
+info:
+  title: Authors and Posts API
+  version: 1.0.0
+  description: >
+    API REST desarrollada con Node.js, Express y PostgreSQL.
+    Permite administrar autores y publicaciones.
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor local
+
+tags:
+  - name: Authors
+    description: Operaciones relacionadas con autores
+  - name: Posts
+    description: Operaciones relacionadas con publicaciones
+
+paths:
+  /authors:
+    get:
+      tags:
+        - Authors
+      summary: Obtener todos los autores
+      responses:
+        "200":
+          description: Lista de autores obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Author"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Authors
+      summary: Crear un nuevo autor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthorInput"
+            example:
+              name: Ana García
+              email: ana@example.com
+              bio: Desarrolladora full stack
+      responses:
+        "201":
+          description: Autor creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Author"
+        "400":
+          description: Datos inválidos o email repetido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                nameRequired:
+                  value:
+                    message: Name is required
+                emailRequired:
+                  value:
+                    message: Email is required
+                emailExists:
+                  value:
+                    message: Email already exists
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /authors/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+
+    get:
+      tags:
+        - Authors
+      summary: Obtener un autor por ID
+      responses:
+        "200":
+          description: Autor obtenido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Author"
+        "404":
+          description: Autor no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: Author not found
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    put:
+      tags:
+        - Authors
+      summary: Actualizar un autor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthorInput"
+            example:
+              name: Ana García Actualizada
+              email: ana.actualizada@example.com
+              bio: Desarrolladora senior
+      responses:
+        "200":
+          description: Autor actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Author"
+        "400":
+          description: Datos inválidos o email repetido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Autor no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: Author not found
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    delete:
+      tags:
+        - Authors
+      summary: Eliminar un autor
+      responses:
+        "204":
+          description: Autor eliminado correctamente
+        "404":
+          description: Autor no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: Author not found
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /posts:
+    get:
+      tags:
+        - Posts
+      summary: Obtener todos los posts
+      responses:
+        "200":
+          description: Lista de posts obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Posts
+      summary: Crear un nuevo post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostInput"
+            example:
+              title: Introducción a Express
+              content: Contenido del post
+              author_id: 1
+              published: true
+      responses:
+        "201":
+          description: Post creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "400":
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                titleRequired:
+                  value:
+                    message: Title is required
+                contentRequired:
+                  value:
+                    message: Content is required
+                authorRequired:
+                  value:
+                    message: Author ID is required
+        "404":
+          description: Autor no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: Author not found
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /posts/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+
+    get:
+      tags:
+        - Posts
+      summary: Obtener un post por ID
+      responses:
+        "200":
+          description: Post obtenido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "404":
+          description: Post no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: Post not found
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    put:
+      tags:
+        - Posts
+      summary: Actualizar un post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostInput"
+            example:
+              title: Express actualizado
+              content: Contenido actualizado
+              author_id: 1
+              published: true
+      responses:
+        "200":
+          description: Post actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "400":
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Post o autor no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                postNotFound:
+                  value:
+                    message: Post not found
+                authorNotFound:
+                  value:
+                    message: Author not found
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    delete:
+      tags:
+        - Posts
+      summary: Eliminar un post
+      responses:
+        "204":
+          description: Post eliminado correctamente
+        "404":
+          description: Post no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: Post not found
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /posts/author/{authorId}:
+    get:
+      tags:
+        - Posts
+      summary: Obtener todos los posts de un autor
+      parameters:
+        - name: authorId
+          in: path
+          required: true
+          description: ID del autor
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "200":
+          description: Posts del autor obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PostWithAuthor"
+        "404":
+          description: Autor no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: Author not found
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      description: Identificador único del recurso
+      schema:
+        type: integer
+        minimum: 1
+
+  schemas:
+    Author:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Ana García
+        email:
+          type: string
+          format: email
+          example: ana@example.com
+        bio:
+          type:
+            - string
+            - "null"
+          example: Desarrolladora full stack
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - email
+
+    AuthorInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          format: email
+        bio:
+          type:
+            - string
+            - "null"
+      required:
+        - name
+        - email
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Introducción a Express
+        content:
+          type: string
+          example: Contenido del post
+        author_id:
+          type: integer
+          example: 1
+        published:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - content
+        - author_id
+        - published
+
+    PostInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        content:
+          type: string
+          minLength: 1
+        author_id:
+          type: integer
+          minimum: 1
+        published:
+          type: boolean
+          default: false
+      required:
+        - title
+        - content
+        - author_id
+
+    PostWithAuthor:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        published:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        author_id:
+          type: integer
+        author_name:
+          type: string
+        author_email:
+          type: string
+          format: email
+        author_bio:
+          type:
+            - string
+            - "null"
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Resource not found
+      required:
+        - message
+
+  responses:
+    InternalServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            message: Internal Server Error
