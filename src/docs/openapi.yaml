@@ -8,6 +8,9 @@ info:
     Permite administrar autores y publicaciones.
 
 servers:
+  - url: https://proyectom2paulcorrales-production.up.railway.app
+    description: Servidor de producción (Railway)
+
   - url: http://localhost:3000
     description: Servidor local
 
