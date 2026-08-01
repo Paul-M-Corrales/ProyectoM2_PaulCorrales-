@@ -197,11 +197,11 @@ Durante el desarrollo del proyecto se utilizó ChatGPT como herramienta de apoyo
 
 ### Consulta 1
 
-![Consulta IA 1](docs/AI/IA-1.png)
+![Consulta IA 1](src/docs/AI/IA-1.png)
 
 ### Consulta 2
 
-![Consulta IA 2](docs/AI/IA-2.png)
+![Consulta IA 2](src/docs/AI/IA-2.png)
 
 ---
 
