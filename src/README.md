@@ -1,49 +1,70 @@
-# 📚 Authors & Posts API
+# 📚 API MiniBlog
 
-API REST desarrollada con Node.js, Express y PostgreSQL.
+API REST desarrollada con **Node.js**, **Express** y **PostgreSQL** como parte del **Proyecto Integrador M2 de Soy Henry**.
 
-Permite administrar autores y publicaciones mediante operaciones CRUD.
+## 📖 Contexto
+
+Este proyecto fue desarrollado simulando el rol de **Backend Developer Junior** en **DevSpark**, una startup que está construyendo la primera versión de su servicio de contenidos **MiniBlog**.
+
+El objetivo fue desarrollar una API REST estable y documentada que permita administrar **autores** y **publicaciones**, sirviendo como base para futuras integraciones con frontend, autenticación y nuevas funcionalidades.
+
+La API implementa:
+
+- CRUD completo de autores y publicaciones.
+- Persistencia de datos en PostgreSQL.
+- Validaciones de datos.
+- Consultas SQL parametrizadas.
+- Tests automatizados.
+- Documentación OpenAPI con Swagger.
+- Deploy en Railway.
 
 ---
 
-## 🌐 Demo
+# 🌐 Demo
 
-**API:**
+### API
 
-https://TU-URL-DE-RAILWAY.up.railway.app
+https://proyectom2paulcorrales-production.up.railway.app/
 
-**Swagger:**
+### Swagger
 
-https://TU-URL-DE-RAILWAY.up.railway.app/docs
+https://proyectom2paulcorrales-production.up.railway.app/docs
 
 ---
 
-## 🚀 Tecnologías
+# 🚀 Tecnologías
 
-- Node.js
+- Node.js 22
 - Express 5
 - PostgreSQL
 - pg
 - Vitest
 - Supertest
-- Swagger UI
+- Swagger UI Express
 - OpenAPI 3.1
 
 ---
 
-## 📁 Instalación
+# 📋 Requisitos
+
+- Node.js 22 o superior
+- PostgreSQL
+- npm
+
+---
+
+# 📁 Instalación
 
 Clonar el repositorio
 
-```bash
-git clone <URL_DEL_REPOSITORIO>
-```
+````bash
+git clone https://github.com/Paul-M-Corrales/ProyectoM2_PaulCorrales-
 
-Entrar al proyecto
+Ingresar al proyecto
 
 ```bash
-cd M2
-```
+cd ProyectoM2_PaulCorrales
+````
 
 Instalar dependencias
 
@@ -53,23 +74,20 @@ npm install
 
 ---
 
-## ⚙️ Variables de entorno
+# ⚙️ Variables de entorno
 
 Crear un archivo `.env`
 
 ```env
-DB_HOST=
-DB_PORT=
-DB_NAME=
-DB_USER=
-DB_PASSWORD=
+DATABASE_URL=postgresql://usuario:password@host:5432/database
+PORT=3000
 ```
 
 ---
 
-## 🗄️ Base de datos
+# 🗄️ Base de datos
 
-Crear la base de datos y ejecutar:
+Crear una base de datos PostgreSQL y ejecutar el script de creación:
 
 ```sql
 setup.sql
@@ -83,7 +101,7 @@ seed.sql
 
 ---
 
-## ▶️ Ejecutar
+# ▶️ Ejecutar el proyecto
 
 Modo desarrollo
 
@@ -91,7 +109,7 @@ Modo desarrollo
 npm run dev
 ```
 
-Producción
+Modo producción
 
 ```bash
 npm start
@@ -99,7 +117,7 @@ npm start
 
 ---
 
-## 🧪 Ejecutar Tests
+# 🧪 Ejecutar los tests
 
 ```bash
 npm test
@@ -107,43 +125,89 @@ npm test
 
 ---
 
-## 📖 Documentación
+# 📖 Documentación
 
-Swagger UI disponible en:
+La documentación OpenAPI está disponible mediante Swagger UI.
+
+Local:
 
 ```
 http://localhost:3000/docs
 ```
 
----
+Producción:
 
-## 📌 Endpoints
-
-### Authors
-
-- GET /authors
-- GET /authors/:id
-- POST /authors
-- PUT /authors/:id
-- DELETE /authors/:id
-
-### Posts
-
-- GET /posts
-- GET /posts/:id
-- GET /posts/author/:authorId
-- POST /posts
-- PUT /posts/:id
-- DELETE /posts/:id
+```
+https://proyectom2paulcorrales-production.up.railway.app/docs
+```
 
 ---
 
-## 🚂 Deploy
+# 📌 Endpoints
 
-Aplicación preparada para desplegarse en Railway.
+## Authors
+
+| Método | Endpoint     |
+| ------ | ------------ |
+| GET    | /authors     |
+| GET    | /authors/:id |
+| POST   | /authors     |
+| PUT    | /authors/:id |
+| DELETE | /authors/:id |
+
+## Posts
+
+| Método | Endpoint                |
+| ------ | ----------------------- |
+| GET    | /posts                  |
+| GET    | /posts/:id              |
+| GET    | /posts/author/:authorId |
+| POST   | /posts                  |
+| PUT    | /posts/:id              |
+| DELETE | /posts/:id              |
 
 ---
 
-## 👨‍💻 Autor
+# 🚂 Deploy
 
-Paúl Matías Corrales
+La aplicación se encuentra desplegada en Railway.
+
+API
+
+https://proyectom2paulcorrales-production.up.railway.app/
+
+Swagger
+
+https://proyectom2paulcorrales-production.up.railway.app/docs
+
+---
+
+# 🤖 Uso de Inteligencia Artificial
+
+Durante el desarrollo del proyecto se utilizó ChatGPT como herramienta de apoyo para:
+
+- Resolver dudas sobre Express y PostgreSQL.
+- Revisar consultas SQL.
+- Detectar errores durante la integración con PostgreSQL.
+- Resolver inconvenientes durante el deployment en Railway.
+- Revisar la documentación OpenAPI.
+- Mejorar la documentación del proyecto (README).
+
+## 📸 Capturas de consultas realizadas con IA
+
+### Consulta 1
+
+![Consulta IA 1](docs/AI/IA-1.png)
+
+### Consulta 2
+
+![Consulta IA 2](docs/AI/IA-2.png)
+
+---
+
+# 👨‍💻 Autor
+
+**Paúl Matías Corrales**
+
+- GitHub: https://github.com/Paul-M-Corrales
+- LinkedIn: https://www.linkedin.com/in/paúl-corrales-90957b237/
