@@ -6,14 +6,21 @@ API REST desarrollada con **Node.js**, **Express** y **PostgreSQL** como parte d
 
 Este proyecto fue desarrollado simulando el rol de **Backend Developer Junior** en **DevSpark**, una startup que está construyendo la primera versión de su servicio de contenidos **MiniBlog**.
 
-El objetivo fue desarrollar una API REST estable y documentada que permita administrar **autores** y **publicaciones**, sirviendo como base para futuras integraciones con frontend, autenticación y nuevas funcionalidades.
+El objetivo fue desarrollar una API REST estable y documentada que permita administrar **autores**, **publicaciones** y **comentarios**, sirviendo como base para futuras integraciones con frontend, autenticación y nuevas funcionalidades.
 
 La API implementa:
 
-- CRUD completo de autores y publicaciones.
+- CRUD completo de autores.
+- CRUD completo de publicaciones.
+- Creación y consulta de comentarios.
+- Relación entre autores, publicaciones y comentarios.
 - Persistencia de datos en PostgreSQL.
+- Integridad referencial mediante claves foráneas.
+- Eliminación en cascada mediante `ON DELETE CASCADE`.
+- Arquitectura separada en routes, controllers y services.
 - Validaciones de datos.
 - Consultas SQL parametrizadas.
+- Manejo centralizado de errores.
 - Tests automatizados.
 - Documentación OpenAPI con Swagger.
 - Deploy en Railway.
@@ -42,6 +49,7 @@ https://proyectom2paulcorrales-production.up.railway.app/docs
 - Supertest
 - Swagger UI Express
 - OpenAPI 3.1
+- Railway
 
 ---
 
@@ -55,18 +63,19 @@ https://proyectom2paulcorrales-production.up.railway.app/docs
 
 # 📁 Instalación
 
-Clonar el repositorio
-
-````bash
-git clone https://github.com/Paul-M-Corrales/ProyectoM2_PaulCorrales-
-
-Ingresar al proyecto
+Clonar el repositorio:
 
 ```bash
-cd ProyectoM2_PaulCorrales
-````
+git clone https://github.com/Paul-M-Corrales/ProyectoM2_PaulCorrales-
+```
 
-Instalar dependencias
+Ingresar al proyecto:
+
+```bash
+cd ProyectoM2_PaulCorrales-
+```
+
+Instalar dependencias:
 
 ```bash
 npm install
@@ -76,40 +85,91 @@ npm install
 
 # ⚙️ Variables de entorno
 
-Crear un archivo `.env`
+Crear un archivo `.env` en la raíz del proyecto:
 
 ```env
-DATABASE_URL=postgresql://usuario:password@host:5432/database
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=miniblog_db
+DB_USER=postgres
+DB_PASSWORD=tu_password
 PORT=3000
 ```
+
+Configurar los valores de acuerdo con la instalación local de PostgreSQL.
 
 ---
 
 # 🗄️ Base de datos
 
-Crear una base de datos PostgreSQL y ejecutar el script de creación:
+Crear una base de datos PostgreSQL y ejecutar el script:
 
-```sql
-setup.sql
+```text
+src/db/setup.sql
 ```
 
 Luego cargar los datos iniciales:
 
-```sql
-seed.sql
+```text
+src/db/seed.sql
 ```
+
+La base de datos contiene tres entidades principales:
+
+- `authors`
+- `posts`
+- `comments`
+
+Las publicaciones están asociadas a autores y los comentarios están asociados tanto a publicaciones como a autores.
+
+Las relaciones utilizan claves foráneas y `ON DELETE CASCADE` para mantener la integridad referencial.
+
+---
+
+# 🏗️ Arquitectura
+
+El proyecto separa las responsabilidades principales en distintas capas:
+
+```text
+src/
+├── controllers/
+│   ├── authors.controller.js
+│   ├── posts.controller.js
+│   └── comments.controller.js
+│
+├── services/
+│   ├── authors.service.js
+│   ├── posts.service.js
+│   └── comments.service.js
+│
+├── routes/
+│   ├── authors.routes.js
+│   ├── posts.routes.js
+│   └── comments.routes.js
+│
+├── db/
+│   ├── config.js
+│   ├── setup.sql
+│   ├── seed.sql
+│   └── migrations/
+│
+└── docs/
+    └── openapi.yaml
+```
+
+Los **controllers** gestionan las solicitudes y respuestas HTTP, mientras que los **services** contienen la lógica de acceso a datos mediante PostgreSQL.
 
 ---
 
 # ▶️ Ejecutar el proyecto
 
-Modo desarrollo
+Modo desarrollo:
 
 ```bash
 npm run dev
 ```
 
-Modo producción
+Modo producción:
 
 ```bash
 npm start
@@ -123,21 +183,23 @@ npm start
 npm test
 ```
 
+Los tests automatizados utilizan **Vitest** y **Supertest**.
+
 ---
 
 # 📖 Documentación
 
 La documentación OpenAPI está disponible mediante Swagger UI.
 
-Local:
+### Local
 
-```
+```text
 http://localhost:3000/docs
 ```
 
-Producción:
+### Producción
 
-```
+```text
 https://proyectom2paulcorrales-production.up.railway.app/docs
 ```
 
@@ -147,36 +209,86 @@ https://proyectom2paulcorrales-production.up.railway.app/docs
 
 ## Authors
 
-| Método | Endpoint     |
-| ------ | ------------ |
-| GET    | /authors     |
-| GET    | /authors/:id |
-| POST   | /authors     |
-| PUT    | /authors/:id |
-| DELETE | /authors/:id |
+| Método | Endpoint       |
+| ------ | -------------- |
+| GET    | `/authors`     |
+| GET    | `/authors/:id` |
+| POST   | `/authors`     |
+| PUT    | `/authors/:id` |
+| DELETE | `/authors/:id` |
 
 ## Posts
 
-| Método | Endpoint                |
-| ------ | ----------------------- |
-| GET    | /posts                  |
-| GET    | /posts/:id              |
-| GET    | /posts/author/:authorId |
-| POST   | /posts                  |
-| PUT    | /posts/:id              |
-| DELETE | /posts/:id              |
+| Método | Endpoint                  |
+| ------ | ------------------------- |
+| GET    | `/posts`                  |
+| GET    | `/posts/:id`              |
+| GET    | `/posts/author/:authorId` |
+| POST   | `/posts`                  |
+| PUT    | `/posts/:id`              |
+| DELETE | `/posts/:id`              |
+
+## Comments
+
+| Método | Endpoint                 |
+| ------ | ------------------------ |
+| GET    | `/comments`              |
+| GET    | `/comments/post/:postId` |
+| POST   | `/comments`              |
+
+---
+
+# ⭐ Extra Credit — Comments
+
+Como funcionalidad adicional se incorporó la entidad `comments`.
+
+Cada comentario contiene:
+
+- Contenido.
+- Publicación asociada.
+- Autor asociado.
+- Fecha de creación.
+
+La tabla utiliza claves foráneas hacia `posts` y `authors`.
+
+```text
+comments
+├── id
+├── content
+├── post_id → posts(id)
+├── author_id → authors(id)
+└── created_at
+```
+
+Las relaciones utilizan:
+
+```sql
+ON DELETE CASCADE
+```
+
+De esta manera, al eliminar una publicación se eliminan automáticamente sus comentarios asociados, y al eliminar un autor también se eliminan sus comentarios.
+
+La funcionalidad fue incorporada siguiendo la arquitectura existente mediante:
+
+- `comments.routes.js`
+- `comments.controller.js`
+- `comments.service.js`
+
+Los endpoints de comentarios también se encuentran disponibles en la documentación Swagger.
+
+La funcionalidad está desplegada y operativa en Railway.
 
 ---
 
 # 🚂 Deploy
 
-La aplicación se encuentra desplegada en Railway.
+La aplicación y la base de datos PostgreSQL se encuentran desplegadas en **Railway**.
 
-API
+### API
 
 https://proyectom2paulcorrales-production.up.railway.app/
 
-Swagger
+### Swagger
 
 https://proyectom2paulcorrales-production.up.railway.app/docs
 
@@ -188,20 +300,22 @@ Durante el desarrollo del proyecto se utilizó ChatGPT como herramienta de apoyo
 
 - Resolver dudas sobre Express y PostgreSQL.
 - Revisar consultas SQL.
-- Detectar errores durante la integración con PostgreSQL.
+- Analizar errores durante la integración con PostgreSQL.
 - Resolver inconvenientes durante el deployment en Railway.
 - Revisar la documentación OpenAPI.
-- Mejorar la documentación del proyecto (README).
+- Analizar la separación de responsabilidades entre controllers y services.
+- Implementar y verificar el Extra Credit de comentarios.
+- Mejorar la documentación del proyecto.
 
 ## 📸 Capturas de consultas realizadas con IA
 
 ### Consulta 1
 
-![Consulta IA 1](src/docs/AI/IA-1.png)
+Agregar aquí captura de una consulta realizada durante el desarrollo.
 
 ### Consulta 2
 
-![Consulta IA 2](src/docs/AI/IA-2.png)
+Agregar aquí captura de una segunda consulta realizada durante el desarrollo.
 
 ---
 
