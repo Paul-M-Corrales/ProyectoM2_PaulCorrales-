@@ -1,13 +1,18 @@
-import pool from "../db/config.js";
+import {
+  getAllAuthorsService,
+  getAuthorByIdService,
+  getAuthorByEmailService,
+  getAuthorByEmailExceptIdService,
+  createAuthorService,
+  updateAuthorService,
+  deleteAuthorService,
+} from "../services/authors.service.js";
 
 export const getAuthors = async (req, res, next) => {
   try {
-    const result = await pool.query(`
-      SELECT *
-      FROM authors;
-    `);
+    const authors = await getAllAuthorsService();
 
-    res.status(200).json(result.rows);
+    res.status(200).json(authors);
   } catch (error) {
     next(error);
   }
@@ -17,22 +22,15 @@ export const getAuthorById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const result = await pool.query(
-      `
-      SELECT *
-      FROM authors
-      WHERE id = $1;
-      `,
-      [id],
-    );
+    const author = await getAuthorByIdService(id);
 
-    if (result.rows.length === 0) {
+    if (!author) {
       return res.status(404).json({
         message: "Author not found",
       });
     }
 
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(author);
   } catch (error) {
     next(error);
   }
@@ -54,31 +52,17 @@ export const createAuthor = async (req, res, next) => {
       });
     }
 
-    const existingAuthor = await pool.query(
-      `
-      SELECT id
-      FROM authors
-      WHERE email = $1;
-      `,
-      [email],
-    );
+    const existingAuthor = await getAuthorByEmailService(email);
 
-    if (existingAuthor.rows.length > 0) {
+    if (existingAuthor) {
       return res.status(400).json({
         message: "Email already exists",
       });
     }
 
-    const result = await pool.query(
-      `
-      INSERT INTO authors (name, email, bio)
-      VALUES ($1, $2, $3)
-      RETURNING *;
-      `,
-      [name, email, bio],
-    );
+    const author = await createAuthorService(name, email, bio);
 
-    res.status(201).json(result.rows[0]);
+    res.status(201).json(author);
   } catch (error) {
     next(error);
   }
@@ -101,41 +85,23 @@ export const updateAuthor = async (req, res, next) => {
       });
     }
 
-    const existingEmail = await pool.query(
-      `
-      SELECT id
-      FROM authors
-      WHERE email = $1
-        AND id != $2;
-      `,
-      [email, id],
-    );
+    const existingEmail = await getAuthorByEmailExceptIdService(email, id);
 
-    if (existingEmail.rows.length > 0) {
+    if (existingEmail) {
       return res.status(400).json({
         message: "Email already exists",
       });
     }
 
-    const result = await pool.query(
-      `
-      UPDATE authors
-      SET name = $1,
-          email = $2,
-          bio = $3
-      WHERE id = $4
-      RETURNING *;
-      `,
-      [name, email, bio, id],
-    );
+    const author = await updateAuthorService(id, name, email, bio);
 
-    if (result.rows.length === 0) {
+    if (!author) {
       return res.status(404).json({
         message: "Author not found",
       });
     }
 
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(author);
   } catch (error) {
     next(error);
   }
@@ -145,16 +111,9 @@ export const deleteAuthor = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const result = await pool.query(
-      `
-      DELETE FROM authors
-      WHERE id = $1
-      RETURNING *;
-      `,
-      [id],
-    );
+    const author = await deleteAuthorService(id);
 
-    if (result.rows.length === 0) {
+    if (!author) {
       return res.status(404).json({
         message: "Author not found",
       });

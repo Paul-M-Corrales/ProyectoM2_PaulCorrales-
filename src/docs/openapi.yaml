@@ -1,11 +1,11 @@
 openapi: 3.1.0
 
 info:
-  title: Authors and Posts API
+  title: MiniBlog API
   version: 1.0.0
   description: >
     API REST desarrollada con Node.js, Express y PostgreSQL.
-    Permite administrar autores y publicaciones.
+    Permite administrar autores, publicaciones y comentarios.
 
 servers:
   - url: https://proyectom2paulcorrales-production.up.railway.app
@@ -17,8 +17,12 @@ servers:
 tags:
   - name: Authors
     description: Operaciones relacionadas con autores
+
   - name: Posts
     description: Operaciones relacionadas con publicaciones
+
+  - name: Comments
+    description: Operaciones relacionadas con comentarios
 
 paths:
   /authors:
@@ -347,6 +351,109 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /comments:
+    get:
+      tags:
+        - Comments
+      summary: Obtener todos los comentarios
+      responses:
+        "200":
+          description: Lista de comentarios obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommentWithDetails"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Comments
+      summary: Crear un nuevo comentario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentInput"
+            example:
+              content: Excelente post
+              post_id: 1
+              author_id: 2
+      responses:
+        "201":
+          description: Comentario creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "400":
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                contentRequired:
+                  value:
+                    message: Content is required
+                postRequired:
+                  value:
+                    message: Post ID is required
+                authorRequired:
+                  value:
+                    message: Author ID is required
+        "404":
+          description: Post o autor no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                postNotFound:
+                  value:
+                    message: Post not found
+                authorNotFound:
+                  value:
+                    message: Author not found
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /comments/post/{postId}:
+    get:
+      tags:
+        - Comments
+      summary: Obtener comentarios de un post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: ID del post
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "200":
+          description: Comentarios del post obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommentWithDetails"
+        "404":
+          description: Post no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: Post not found
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
 components:
   parameters:
     Id:
@@ -475,6 +582,77 @@ components:
           type:
             - string
             - "null"
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        content:
+          type: string
+          example: Excelente post
+        post_id:
+          type: integer
+          example: 1
+        author_id:
+          type: integer
+          example: 2
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - content
+        - post_id
+        - author_id
+
+    CommentInput:
+      type: object
+      properties:
+        content:
+          type: string
+          minLength: 1
+          example: Excelente post
+        post_id:
+          type: integer
+          minimum: 1
+          example: 1
+        author_id:
+          type: integer
+          minimum: 1
+          example: 2
+      required:
+        - content
+        - post_id
+        - author_id
+
+    CommentWithDetails:
+      type: object
+      properties:
+        id:
+          type: integer
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        post_id:
+          type: integer
+        post_title:
+          type: string
+        author_id:
+          type: integer
+        author_name:
+          type: string
+        author_email:
+          type: string
+          format: email
+      required:
+        - id
+        - content
+        - post_id
+        - author_id
 
     Error:
       type: object
